@@ -2,6 +2,7 @@
 import { render } from "solid-js/web";
 import { Router, Route } from "@solidjs/router";
 import { StoreProvider } from "./store";
+import { BASE } from "./common/constants";
 
 import "./index.css";
 import App from "./App";
@@ -32,7 +33,7 @@ async function enableMocking() {
 enableMocking().then(() =>
   render(
     () => (
-      <Router base="/nextflix-web/">
+      <Router base={BASE}>
         <StoreProvider>
           <App />
         </StoreProvider>
