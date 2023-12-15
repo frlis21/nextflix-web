@@ -6,6 +6,10 @@ function InputField(props) {
   const [isFocused, setFocused] = createSignal(false);
   const [value, setValue] = createSignal("");
   const shouldYeet = createMemo(() => isFocused() || value() !== "");
+  const onInput = (e) => {
+    setValue(e.target.value)
+    props.update?.(e.target.value)
+  }
 
   return (
     <div class="py-2 px-3 bg-gray-200 rounded-lg w-full">
@@ -27,7 +31,7 @@ function InputField(props) {
         <input
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          onChange={(e) => setValue(e.target.value)}
+          onInput={onInput}
           class="bg-transparent focus:outline-none h-full w-full pt-2"
           type={props.type}
         />

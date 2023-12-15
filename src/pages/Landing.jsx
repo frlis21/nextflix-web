@@ -1,11 +1,18 @@
 import { createSignal } from "solid-js";
-import { A } from "@solidjs/router";
+import { A, useNavigate } from "@solidjs/router";
 import InputField from "../components/InputField";
 import Nextflix from "../components/Nextflix";
 import FlyingNavbar from "../components/FlyingNavbar";
+import { useUser } from "../store";
 import { SkipForwardCircle, ArrowCircleDown } from "phosphor-solid";
 
 function FirstScreen(props) {
+  const navigate = useNavigate();
+  const [user, { register }] = useUser();
+  const [name, setName] = createSignal("");
+  const [email, setEmail] = createSignal("");
+  const [password, setPassword] = createSignal("");
+
   return (
     <div class="relative min-h-screen bg-feelsgood bg-no-repeat bg-fixed bg-right-bottom">
       <FlyingNavbar />
@@ -18,13 +25,21 @@ function FirstScreen(props) {
         <h2 class="text-2xl text-neutral-500">Sign up today!</h2>
         <div class="max-w-lg flex gap-4">
           <div class="grow grid grid-cols-1 gap-6">
-            <InputField label="Name" />
-            <InputField label="E-mail" />
-            <InputField label="Password" type="password" />
+            <InputField update={setName} label="Name" />
+            <InputField update={setEmail} label="E-mail" />
+            <InputField update={setPassword} label="Password" type="password" />
           </div>
-          <A href="/setup" class="flex items-center rounded-lg bg-turquoise hover:bg-turquoise-light p-4 transition">
+          <button
+            onClick={async () => {
+              //await register(name(), email(), password())
+              //if (user.isLoggedIn) {
+              navigate("/setup");
+              //}
+            }}
+            class="flex items-center rounded-lg bg-turquoise hover:bg-turquoise-light p-4 transition"
+          >
             <SkipForwardCircle weight="duotone" color="white" size={64} />
-          </A>
+          </button>
         </div>
       </div>
       <div class="flex absolute bottom-4 left-4 items-center">

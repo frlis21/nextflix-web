@@ -10,15 +10,18 @@ import App from "./App";
 const root = document.getElementById("root");
 
 async function enableMocking() {
-  if (import.meta.env.MODE !== "development") {
-    return;
-  }
+  //if (import.meta.env.MODE !== "development") {
+  //  return;
+  //}
 
   const { worker } = await import("./mocks/browser");
 
   return worker.start({
     onUnhandledRequest(request, print) {
-      if (request.url.includes("nextflix-web")) {
+      if (
+        request.url.includes("nextflix-web") ||
+        request.url.includes("image.tmdb.org")
+      ) {
         return;
       }
 
@@ -33,11 +36,11 @@ async function enableMocking() {
 enableMocking().then(() =>
   render(
     () => (
-      <Router base={BASE}>
-        <StoreProvider>
+      <StoreProvider>
+        <Router base={BASE}>
           <App />
-        </StoreProvider>
-      </Router>
+        </Router>
+      </StoreProvider>
     ),
     root,
   ),
