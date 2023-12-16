@@ -19,7 +19,7 @@ import { useGenres } from "../store";
 import { Transition } from "solid-transition-group";
 import { API_BASE } from "../common/constants";
 import { createElementBounds } from "@solid-primitives/bounds";
-import { createMovies } from "../common/createMovies";
+import createMovies from "../common/createMovies";
 
 // TODO: stop using globals.......
 const [filters, setFilters] = createStore({
@@ -162,6 +162,7 @@ function Setup() {
     movieLoader()[0].movies.map((movie) => movie.id),
   );
 
+  // Load more movies at bottom of page
   createEffect(() => {
     const [movies, loadMovies] = movieLoader();
     if (

@@ -7,10 +7,21 @@ const moviesById = Object.fromEntries(
   data.movies.map((movie) => [movie.id, movie]),
 );
 
+function recommend(ratings) {
+  // Just shuffle movies
+  return data.movies
+    .filter((movie) => !(movie.id in ratings))
+    .map((value) => ({ value, key: Math.random() }))
+    .sort((a, b) => a.key - b.key)
+    .map(({ value }) => value);
+}
+
 const users = {
   admin: {
     name: "Administrator",
     password: "password",
+    ratings: {},
+    recommendations: recommend({}),
   },
 };
 
@@ -121,13 +132,22 @@ export const handlers = [
     const info = await request.formData();
     const email = info.get("email");
     const password = info.get("password");
-    return users[email].password === password
-      ? HttpResponse.json({
-          token: "dummy",
-        })
-      : new HttpResponse(null, {
-          status: 418,
-        });
+    if (!(email in users) || users[email].password !== password) {
+      return new HttpResponse(null, {
+        status: 418,
+      });
+    }
+    users[email].recommendations = recommend(users[email].ratings)
+    return HttpResponse.json({
+      token: "dummy",
+    });
+  }),
+
+  http.get(API_BASE + "/users/:email", async ({ params }) => {
+    if (params.email in users) {
+      return HttpResponse.json(users[params.email]);
+    }
+    return new HttpResponse(null, { status: 418 });
   }),
 
   http.post(API_BASE + "/register", async ({ request }) => {
@@ -136,8 +156,8 @@ export const handlers = [
     const email = info.get("email");
     const password = info.get("password");
 
-    if (email in users) {
-      new HttpResponse(null, {
+    if (email in users || email === "" || password === "") {
+      return new HttpResponse(null, {
         status: 418,
       });
     }
@@ -145,10 +165,68 @@ export const handlers = [
     users[email] = {
       name,
       password,
+      ratings: {},
     };
+
+    users[email].recommendations = recommend({});
 
     return HttpResponse.json({
       token: "dummy",
     });
   }),
+
+  http.post(API_BASE + "/users/:email/movies/:id/like", async ({ params }) => {
+    if (params.email in users) {
+      if (users[params.email].ratings[params.id] === true) {
+        delete users[params.email].ratings[params.id];
+      } else {
+        users[params.email].ratings[params.id] = true;
+      }
+      users[params.email].recommendations = recommend(
+        users[params.email].ratings,
+      );
+      return new HttpResponse(null, { status: 200 });
+    }
+    return new HttpResponse(null, {
+      status: 418,
+    });
+  }),
+
+  http.post(
+    API_BASE + "/users/:email/movies/:id/dislike",
+    async ({ params }) => {
+      if (params.email in users) {
+        if (users[params.email].ratings[params.id] === false) {
+          delete users[params.email].ratings[params.id];
+        } else {
+          users[params.email].ratings[params.id] = false;
+        }
+        users[params.email].recommendations = recommend(
+          users[params.email].ratings,
+        );
+        return new HttpResponse(null, { status: 200 });
+      }
+      return new HttpResponse(null, {
+        status: 418,
+      });
+    },
+  ),
+
+  http.get(
+    API_BASE + "/users/:email/recommendations",
+    ({ request, params }) => {
+      const recommendations = users[params.email].recommendations;
+      const searchParams = new URL(request.url).searchParams;
+      const pages = Math.ceil(recommendations.length / PAGE_SIZE);
+      const page =
+        (searchParams.has("page") &&
+          Math.min(searchParams.get("page"), pages)) ||
+        1;
+      return HttpResponse.json({
+        page,
+        pages,
+        movies: recommendations.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+      });
+    },
+  ),
 ];

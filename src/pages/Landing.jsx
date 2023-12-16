@@ -2,11 +2,11 @@ import { createSignal } from "solid-js";
 import { A, useNavigate } from "@solidjs/router";
 import InputField from "../components/InputField";
 import Nextflix from "../components/Nextflix";
-import FlyingNavbar from "../components/FlyingNavbar";
+import Navbar from "../components/Navbar";
 import { useUser } from "../store";
 import { SkipForwardCircle, ArrowCircleDown } from "phosphor-solid";
 
-function FirstScreen(props) {
+function Landing(props) {
   const navigate = useNavigate();
   const [user, { register }] = useUser();
   const [name, setName] = createSignal("");
@@ -14,8 +14,8 @@ function FirstScreen(props) {
   const [password, setPassword] = createSignal("");
 
   return (
-    <div class="relative min-h-screen bg-feelsgood bg-no-repeat bg-fixed bg-right-bottom">
-      <FlyingNavbar />
+    <div class="min-h-screen bg-feelsgood bg-no-repeat bg-fixed bg-right-bottom">
+      <Navbar />
       <div class="flex flex-col p-8 gap-6">
         <h1 class="text-5xl font-bold">
           Many hours spent <br />
@@ -31,10 +31,10 @@ function FirstScreen(props) {
           </div>
           <button
             onClick={async () => {
-              //await register(name(), email(), password())
-              //if (user.isLoggedIn) {
-              navigate("/setup");
-              //}
+              await register(name(), email(), password())
+              if (user.isLoggedIn) {
+                navigate("/setup");
+              }
             }}
             class="flex items-center rounded-lg bg-turquoise hover:bg-turquoise-light p-4 transition"
           >
@@ -47,15 +47,6 @@ function FirstScreen(props) {
         <p class="text-neutral-400">Read more below!</p>
       </div>
     </div>
-  );
-}
-
-function Landing() {
-  return (
-    <>
-      <FirstScreen />
-      <div class="h-96 bg-gray-200">hi</div>
-    </>
   );
 }
 

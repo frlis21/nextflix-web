@@ -1,7 +1,8 @@
 import { Show } from "solid-js";
-import { A, useLocation } from "@solidjs/router";
+import { A, useNavigate } from "@solidjs/router";
 import useBasedMatch from "../common/useBasedMatch";
 import Nextflix from "./Nextflix";
+import { useUser } from "../store";
 
 function NavLink(props) {
   return (
@@ -14,8 +15,20 @@ function NavLink(props) {
   );
 }
 
-function FlyingNavbar() {
+function Navbar() {
+  const [user, { logout }] = useUser();
+  const navigate = useNavigate();
   const isLoggingIn = useBasedMatch(() => "/login");
+
+  const buttonText = () => {
+    if (user.isLoggedIn) {
+      return "LOG OUT";
+    } else if (isLoggingIn()) {
+      return "REGISTER";
+    } else {
+      return "LOG IN";
+    }
+  };
 
   return (
     <nav class="flex justify-between content-center items-center p-4">
@@ -25,16 +38,25 @@ function FlyingNavbar() {
         <NavLink href="/movies">MOVIES</NavLink>
         <NavLink href="/movies">TV SHOWS</NavLink>
       </div>
-      <A
-        href={isLoggingIn() ? "/" : "/login"}
+      <button
+        onClick={() => {
+          if (user.isLoggedIn) {
+            logout();
+            navigate("/");
+          } else if (isLoggingIn()) {
+            navigate("/");
+          } else {
+            navigate("/login");
+          }
+        }}
         class="text-center border-2 border-black h-fit
         hover:border-turquoise hover:bg-turquoise hover:text-white 
         transition font-bold text-xs rounded-lg px-4 py-2"
       >
-        {isLoggingIn() ? "REGISTER" : "LOG IN"}
-      </A>
+        {buttonText()}
+      </button>
     </nav>
   );
 }
 
-export default FlyingNavbar;
+export default Navbar;

@@ -37,9 +37,7 @@ enableMocking().then(() =>
   render(
     () => (
       <StoreProvider>
-        <Router base={BASE}>
-          <App />
-        </Router>
+        <App />
       </StoreProvider>
     ),
     root,

@@ -17,29 +17,28 @@ import {
 } from "phosphor-solid";
 import { createEventProps } from "@solid-primitives/event-props";
 import Modal from "../components/Modal";
-import { useUser, useGenres } from "../store";
+import { useUser } from "../store";
 import { Transition } from "solid-transition-group";
-import { API_BASE } from "../common/constants";
-import { moviesById } from "../common/createMovies";
+import { IMG_BASE } from "../common/constants";
+import createLikePair from "../common/createLikePair";
+import createMovie from "../common/createMovie";
 import { useWindowScrollPosition } from "@solid-primitives/scroll";
 
 function MovieInfo(props) {
-  const movie = () => moviesById[props.id];
+  const movie = createMovie(() => props.id)
+  const [Like, Dislike] = createLikePair(() => props.id)
   const [user, { like, dislike }] = useUser();
-
-  const likes = () => props.id in user.ratings && user.ratings[props.id];
-  const dislikes = () => props.id in user.ratings && !user.ratings[props.id];
 
   return (
     <div class="max-w-5xl rounded-lg overflow-hidden">
       <div
         class="bg-cover bg-center"
         style={{
-          "background-image": `url("${movie().backdrop}")`,
+          "background-image": `url("${IMG_BASE}w1280${movie()?.backdrop}")`,
         }}
       >
         <div class="flex justify-between items-center p-4 bg-black/80">
-          <h1 class="text-white font-black text-5xl">{movie().name}</h1>
+          <h1 class="text-white font-black text-5xl">{movie()?.name}</h1>
           <button
             onClick={props.onExit}
             class="aspect-square rounded-full hover:bg-red-500 p-2 transition"
@@ -49,38 +48,10 @@ function MovieInfo(props) {
         </div>
       </div>
       <div class="bg-white p-4 flex gap-4">
-        <p class="">{movie().synopsis}</p>
+        <p class="">{movie()?.synopsis}</p>
         <div class="space-y-4">
-          <button
-            onClick={() => like(props.id)}
-            classList={{
-              "bg-neutral-300": !likes(),
-              "bg-green-500": likes(),
-            }}
-            class="aspect-square p-4 rounded-full group hover:bg-green-300 transition"
-          >
-            <ThumbsUp
-              class="m-auto group-hover:-rotate-6 group-active:-rotate-12 transition"
-              weight="duotone"
-              color="white"
-              size={32}
-            />
-          </button>
-          <button
-            onClick={() => dislike(props.id)}
-            classList={{
-              "bg-neutral-300": !dislikes(),
-              "bg-red-500": dislikes(),
-            }}
-            class="aspect-square p-4 rounded-full group hover:bg-red-300 transition"
-          >
-            <ThumbsDown
-              class="m-auto group-hover:rotate-6 group-active:rotate-12 transition"
-              weight="duotone"
-              color="white"
-              size={32}
-            />
-          </button>
+          <Like size={32} />
+          <Dislike size={32} />
         </div>
       </div>
     </div>
@@ -90,7 +61,7 @@ function MovieInfo(props) {
 function Movie(props) {
   const [user] = useUser();
   const [showMovie, setShowMovie] = createSignal(false);
-  const movie = () => moviesById[props.id];
+  const movie = createMovie(() => props.id)
   const thumbClass = "absolute inset-0 pointer-events-none";
 
   // TODO: make modal less terrible :T
@@ -121,7 +92,7 @@ function Movie(props) {
           onClick={() => setShowMovie(true)}
           class="w-full h-full bg-cover shadow-black shadow-lg cursor-pointer
         group-hover:shadow-2xl group-hover:shadow-black group-hover:scale-110 transition"
-          src={movie().poster}
+          src={IMG_BASE + "w500" + movie()?.poster}
         />
         <Show when={props.id in user.ratings}>
           <Show
