@@ -37,6 +37,7 @@ function Navbar() {
         <NavLink href="/about">ABOUT</NavLink>
         <NavLink href="/movies">MOVIES</NavLink>
         <NavLink href="/movies">TV SHOWS</NavLink>
+        <NavLink href="/community">COMMUNITY</NavLink>
       </div>
       <button
         onClick={() => {

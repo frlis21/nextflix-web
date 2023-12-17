@@ -133,11 +133,9 @@ export const handlers = [
     const email = info.get("email");
     const password = info.get("password");
     if (!(email in users) || users[email].password !== password) {
-      return new HttpResponse(null, {
-        status: 418,
-      });
+      return new HttpResponse(null, { status: 418 });
     }
-    users[email].recommendations = recommend(users[email].ratings)
+    users[email].recommendations = recommend(users[email].ratings);
     return HttpResponse.json({
       token: "dummy",
     });
@@ -157,9 +155,7 @@ export const handlers = [
     const password = info.get("password");
 
     if (email in users || email === "" || password === "") {
-      return new HttpResponse(null, {
-        status: 418,
-      });
+      return new HttpResponse(null, { status: 418 });
     }
 
     users[email] = {
@@ -187,9 +183,7 @@ export const handlers = [
       );
       return new HttpResponse(null, { status: 200 });
     }
-    return new HttpResponse(null, {
-      status: 418,
-    });
+    return new HttpResponse(null, { status: 418 });
   }),
 
   http.post(
@@ -206,9 +200,7 @@ export const handlers = [
         );
         return new HttpResponse(null, { status: 200 });
       }
-      return new HttpResponse(null, {
-        status: 418,
-      });
+      return new HttpResponse(null, { status: 418 });
     },
   ),
 
